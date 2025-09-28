@@ -2,12 +2,29 @@
   "name": "nodejs-web-app1",
   "version": "0.0.0",
   "description": "NodejsWebApp1",
-  "main": "server.js",
+  "type": "commonjs",
   "author": {
     "name": ""
   },
-  "devDependencies": {
-    "eslint": "^8.57.1"
+  "scripts": {
+    "dev": "node ./src/index.js",
+    "format": "prettier . --write",
+    "lint": "eslint . --fix"
   },
-  "eslintConfig": {}
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2"
+  },
+  "eslintConfig": {},
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "koa": "^3.0.1",
+    "koa-body": "^6.0.1",
+    "koa-router": "^14.0.0",
+    "koa-static": "^5.0.0"
+  }
 }

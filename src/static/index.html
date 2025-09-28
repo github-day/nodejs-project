@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html lang="zh" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script type="text/javascript" src="https://unpkg.com/crypto-js@4.2.0/crypto-js.js"></script>
+  </head>
+  <body onload="onLoad()">
+    <script>
+      // 表单元素
+      let formEl, fileUploadEl, submitBtnEl, resultEl
+
+      function onLoad() {
+        fileUploadEl = document.getElementById('file-upload-input')
+        formEl = document.getElementById('form')
+        submitBtnEl = document.getElementById('submit-btn')
+        resultEl = document.getElementById('result')
+        if (fileUploadEl) {
+          fileUploadEl.addEventListener('change', onFileChange)
+        }
+        if (formEl) {
+          formEl.addEventListener('submit', onFormSubmit)
+        }
+        getPublicKey()
+      }
+
+      // 公钥
+      let publicKey = ''
+
+      // 获取公钥
+      function getPublicKey() {
+        fetch('/public-key').then(async (res) => {
+          publicKey = await res.text()
+        }).catch(e => {
+          alert('获取公钥失败')
+        })
+      }
+
+      let inputFile
+      const reader = new FileReader()
+      let loading = false
+
+      // 文件改变
+      function onFileChange(event) {
+        inputFile = event.target.files[0]
+        resultEl.innerText = null
+      }
+
+      // 表单提交
+      function onFormSubmit(event) {
+        event.preventDefault()
+        const that = this
+        const formData = new FormData()
+        // 读取文件
+        reader.readAsDataURL(inputFile)
+        reader.onloadstart = e => {
+          loading = true
+          submitBtnEl.disabled = true
+          submitBtnEl.innerText = '上传中...'
+        }
+        reader.onloadend = e => {
+          const binaryFile = e.target.result
+          const encryptedFile = CryptoJS.AES.encrypt(binaryFile, publicKey).toString()
+          formData.append('file', encryptedFile)
+          fetch('/upload', { method: 'post', body: formData }).then(async res => {
+            resultEl.innerText = await res.text()
+          })
+          loading = false
+          submitBtnEl.disabled = false
+          submitBtnEl.innerText = '上传'
+          fileUploadEl.value = null
+        }
+      }
+    </script>
+
+    <form id="form">
+      <div>
+        <input id="file-upload-input" type="file" placeholder="请选择" required />
+      </div>
+      <button type="submit" id="submit-btn">
+        上传
+      </button>
+    </form>
+    <div id="result"></div>
+  </body>
+</html>
