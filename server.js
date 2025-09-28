@@ -11,7 +11,7 @@ const enc = key.encrypt('hello', 'base64');
 const dec = key.decrypt(enc,'utf8')
 
 http.createServer(function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    
     if (req.url === '/') {
         fs.readFile('index.html', (err, content) => {
             if (err) {
@@ -19,6 +19,9 @@ http.createServer(function (req, res) {
                 res.end('error occurred while reading the file.');
             } else {
                 res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.write('<p>your Public-Key:<br>');
+                res.write(key.exportKey('pkcs8-public-pem'));
+                res.write('<br></p>');
                 res.end(content, 'utf-8');
             }
         })
