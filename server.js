@@ -12,9 +12,19 @@ const dec = key.decrypt(enc,'utf8')
 
 http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write(enc);
-    res.write('\n');
-    res.write(key.exportKey('pkcs8-public-pem'));
-    res.end('Hello World\n');
+    if (req.url === '/') {
+        fs.readFile('index.html', (err, content) => {
+            if (err) {
+                res.writeHead(500);
+                res.end('error occurred while reading the file.');
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(content, 'utf-8');
+            }
+        })
+    } else {
+        res.writeHead(404);
+        res.end('Page not found');
+    }
     
 }).listen(port);
